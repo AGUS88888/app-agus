@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Finder App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        h2 { color: #58a6ff; margin-bottom: 20px; }
+        input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #30363d;
+            background-color: #0d1117;
+            color: white;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        input:focus { border-color: #58a6ff; }
+        button {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #2ea043; }
+        .result {
+            margin-top: 25px;
+            text-align: left;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+            display: none;
+        }
+        .avatar {
+            width: 80px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 15px;
+            border: 2px solid #58a6ff;
+        }
+        .repo-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        .repo-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>GitHub User Finder</h2>
+    <p>Masukkan username GitHub untuk melihat profil & jumlah repositori mereka:</p>
+    
+    <input type="text" id="username" placeholder="Contoh: torvalds" value="AGUS88888">
+    <br>
+    <button onclick="cariUserGitHub()">Cari Profil</button>
+
+    <div class="result" id="resultBox">
+        <img id="userAvatar" class="avatar" src="" alt="Avatar">
+        <h3 id="userName" style="text-align:center; margin: 5px 0;"></h3>
+        <p id="userBio" style="font-style: italic; text-align:center; color: #8b949e;"></p>
+        <hr style="border: 0; border-top: 1px solid #30363d;">
+        <p><strong>Lokasi:</strong> <span id="userLocation">-</span></p>
+        <p><strong>Total Repositori Publik:</strong> <span id="userRepos">0</span></p>
+        <center>
+            <a id="profileUrl" class="repo-link" href="#" target="_blank">Kunjungi Profil GitHub →</a>
+        </center>
+    </div>
+</div>
+
+<script>
+    async function cariUserGitHub() {
+        const username = document.getElementById('username').value.trim();
+        const resultBox = document.getElementById('resultBox');
+        
+        if (!username) {
+            alert("Silakan masukkan username terlebih dahulu!");
+            return;
+        }
+
+        try {
+            // Menghubungi API resmi GitHub (Web B)
+            const response = await fetch(`https://api.github.com/users/${username}`);
+            
+            if (!response.ok) {
+                throw new Error("User tidak ditemukan");
+            }
+
+            const data = await response.json();
+
+            // Memasukkan data dari GitHub ke HTML kita
+            document.getElementById('userAvatar').src = data.avatar_url;
+            document.getElementById('userName').innerText = data.name || data.login;
+            document.getElementById('userBio').innerText = data.bio || "Tidak ada bio.";
+            document.getElementById('userLocation').innerText = data.location || "Tidak diketahui";
+            document.getElementById('userRepos').innerText = data.public_repos;
+            document.getElementById('profileUrl').href = data.html_url;
+
+            // Tampilkan kotak hasil
+            resultBox.style.display = 'block';
+        } catch (error) {
+            alert(error.message);
+            resultBox.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
